@@ -7,7 +7,7 @@ import {
   dashboardNavSections,
   isDashboardSlug,
   type DashboardSlug,
-} from "@/components/dashboard/dashboard-content";
+} from "@/components/dashboard/dashboard-nav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -22,12 +22,30 @@ function getActiveSlug(pathname: string): DashboardSlug {
   return isDashboardSlug(slug) ? slug : "dashboard";
 }
 
-export function DashboardShell({ children }: { children: ReactNode }) {
+export function DashboardShell({
+  children,
+  theme = "dark",
+  unreadAlertsCount = 0,
+  wellnessScore = 0,
+  fullName,
+}: {
+  children: ReactNode;
+  theme?: "light" | "dark";
+  unreadAlertsCount?: number;
+  wellnessScore?: number;
+  fullName: string;
+}) {
   const pathname = usePathname();
   const activeSlug = getActiveSlug(pathname);
+  const initials = fullName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("") || "MC";
 
   return (
-    <div className="dashboard-dark-theme app-layout" data-theme="dark">
+    <div className="dashboard-dark-theme app-layout" data-theme={theme}>
       <header className="topbar">
         <div className="topbar-logo">
           <div className="logo-icon">🧠</div>
@@ -38,13 +56,14 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         <div className="topbar-actions">
           <Link className="topbar-btn notif-btn" href="/dashboard/alerts" title="Alerts">
             🔔
+            {unreadAlertsCount > 0 ? <span className="nav-badge">{unreadAlertsCount}</span> : null}
           </Link>
           <button className="topbar-btn" title="Theme">
             ☀️
           </button>
           <Link href="/dashboard/profile" title="Profile">
             <Avatar>
-              <AvatarFallback>A</AvatarFallback>
+              <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
           </Link>
         </div>
@@ -54,9 +73,15 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         <Card className="sidebar-score-card">
           <CardContent>
             <div className="sidebar-score-label">Wellness Score</div>
-            <div className="sidebar-score-value">72</div>
-            <div className="sidebar-score-sub">Moderate - Keep going!</div>
-            <Progress value={72} />
+            <div className="sidebar-score-value">{wellnessScore}</div>
+            <div className="sidebar-score-sub">
+              {wellnessScore >= 75
+                ? "Strong momentum"
+                : wellnessScore >= 50
+                  ? "Moderate - keep going"
+                  : "Early stage - build consistency"}
+            </div>
+            <Progress value={wellnessScore} />
           </CardContent>
         </Card>
 
@@ -76,7 +101,11 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 >
                   <span className="nav-icon">{item.icon}</span>
                   {item.label}
-                  {item.badge ? <span className="nav-badge">{item.badge}</span> : null}
+                  {item.slug === "alerts" && unreadAlertsCount > 0 ? (
+                    <span className="nav-badge">{unreadAlertsCount}</span>
+                  ) : item.badge ? (
+                    <span className="nav-badge">{item.badge}</span>
+                  ) : null}
                 </Link>
               ))}
             </div>

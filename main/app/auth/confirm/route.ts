@@ -2,6 +2,7 @@ import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest } from 'next/server'
 
 import { createClient } from '@/lib/supabase/server'
+import { ensureDashboardRecords } from "@/lib/dashboard/data";
 import { redirect } from 'next/navigation'
 
 export async function GET(request: NextRequest) {
@@ -18,6 +19,14 @@ export async function GET(request: NextRequest) {
       token_hash,
     })
     if (!error) {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        await ensureDashboardRecords(supabase, user);
+      }
+
       // redirect user to specified redirect URL or root of app
       redirect(next)
     }
