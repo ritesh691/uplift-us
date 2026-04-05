@@ -100,21 +100,10 @@ export const dashboardNavSections: Array<{
   },
 ];
 
-export const routeSlugs = dashboardNavSections
-  .flatMap((section) => section.items)
-  .map((item) => item.slug)
-  .filter((slug) => slug !== "dashboard");
-
 export function isDashboardSlug(slug: string): slug is DashboardSlug {
-  return slug === "dashboard" || routeSlugs.includes(slug as Exclude<DashboardSlug, "dashboard">);
-}
-
-export function getRouteTitle(slug: DashboardSlug) {
-  const route = dashboardNavSections
+  return dashboardNavSections
     .flatMap((section) => section.items)
-    .find((item) => item.slug === slug);
-
-  return route?.label ?? "Dashboard";
+    .some((item) => item.slug === slug);
 }
 
 export function DashboardPageContent({ slug }: { slug: DashboardSlug }) {

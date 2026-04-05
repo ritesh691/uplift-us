@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { DashboardPageContent } from "@/components/dashboard/dashboard-content";
 
 export const metadata: Metadata = {
-  title: "Dashboard | MindWell",
+  title: "Suggestions | MindWell",
 };
 
-export default function DashboardPage() {
-  return <DashboardPageContent slug="dashboard" />;
+export default function SuggestionsPage() {
+  return <DashboardPageContent slug="suggestions" />;
 }
